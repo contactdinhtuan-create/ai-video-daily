@@ -1,386 +1,129 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f7f7f5" />
-  <title>Human Bingo Tam Đảo</title>
-  <style>
-    :root{--bg:#f7f7f5;--card:#fff;--text:#1d1d1f;--muted:#6e6e73;--line:#deded8;--accent:#2457d6;--accent2:#eaf0ff;--good:#19733b;--goodbg:#e9f7ee;--warn:#9b5b00;--warnbg:#fff4df;--shadow:0 8px 28px rgba(0,0,0,.07)}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    button,input{font:inherit}
-    button{cursor:pointer}
-    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 42px}
-    .hero{padding:10px 2px 8px}
-    h1{font-size:28px;line-height:1.12;margin:0 0 6px}
-    .sub{color:var(--muted);font-size:14px;line-height:1.45}
-    .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px;box-shadow:var(--shadow)}
-    .panel h2{font-size:17px;margin:0 0 10px}
-    .rules{display:grid;gap:8px;margin:0;padding:0;list-style:none}
-    .rule{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}
-    .badge{flex:0 0 auto;width:28px;height:28px;border-radius:9px;background:var(--accent2);display:grid;place-items:center;font-weight:700;color:var(--accent)}
-    .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .team-btn{min-height:48px;border:1px solid var(--line);background:#fff;border-radius:12px;font-weight:700;color:var(--text)}
-    .team-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .notice{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--warnbg);color:#6e4300;font-size:13px;line-height:1.4}
-    .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-    .primary,.secondary,.danger{min-height:44px;border-radius:12px;padding:0 14px;font-weight:700}
-    .primary{border:1px solid var(--accent);background:var(--accent);color:#fff}
-    .secondary{border:1px solid var(--line);background:#fff;color:var(--text)}
-    .danger{border:1px solid #e0b6b6;background:#fff;color:#a02424}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
-    .stat{background:#fafafa;border:1px solid var(--line);border-radius:12px;padding:9px 6px;text-align:center}
-    .stat b{font-size:18px;display:block}
-    .stat span{font-size:11px;color:var(--muted)}
-    .timer{font-variant-numeric:tabular-nums;font-size:24px;font-weight:800;letter-spacing:.5px}
-    .timer.done{color:#a02424}
-    .board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px}
-    .cell{min-width:0;min-height:132px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 7px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;position:relative;overflow:hidden}
-    .cell .prompt{font-size:11.5px;line-height:1.28;font-weight:650;word-break:break-word}
-    .cell .name{font-size:11px;line-height:1.2;color:var(--muted);margin-top:7px;min-height:24px}
-    .cell.filled{background:var(--accent2);border-color:#9fb6ef}
-    .cell.bingo{outline:2px solid #4ea16c;outline-offset:-2px;background:var(--goodbg)}
-    .cell .tick{display:none;position:absolute;right:5px;top:4px;font-size:13px}
-    .cell.filled .tick{display:block}
-    .legend{font-size:12px;color:var(--muted);line-height:1.45;margin-top:8px}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.44);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:50}
-    .modal.show{display:flex}
-    .sheet{width:min(720px,100%);background:#fff;border-radius:20px;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.25)}
-    .sheet h3{font-size:17px;margin:0 0 6px}
-    .sheet .fullprompt{font-size:15px;line-height:1.45;margin-bottom:12px}
-    label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
-    input{width:100%;min-height:46px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;outline:none}
-    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(36,87,214,.12)}
-    .sheet-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
-    .msg{font-size:13px;min-height:20px;margin-top:8px;color:var(--muted)}
-    .result{display:none;text-align:center}
-    .result.show{display:block}
-    .score-big{font-size:54px;font-weight:900;line-height:1;margin:8px 0;color:var(--accent)}
-    .score-label{font-size:13px;color:var(--muted)}
-    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
-    .result-grid div{border:1px solid var(--line);border-radius:12px;padding:10px 6px;background:#fafafa}
-    .result-grid b{display:block;font-size:19px}
-    .result-grid span{font-size:11px;color:var(--muted)}
-    .foot{font-size:12px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.45}
-    @media (max-width:420px){.wrap{padding-left:10px;padding-right:10px}.cell{min-height:142px;padding:7px 5px}.cell .prompt{font-size:10.8px}.cell .name{font-size:10.3px}.board{gap:4px}.stats{gap:4px}.stat{padding:8px 3px}.stat b{font-size:16px}.sheet-actions{grid-template-columns:1fr 1fr}.sheet-actions .danger{grid-column:1/-1}}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Human Bingo Tam Đảo</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--text:#1e1e20;--muted:#6d6d73;--line:#deded8;--accent:#2f5bd3;--soft:#edf2ff;--good:#19733b;--goodbg:#e9f7ee;--warn:#8a5700;--warnbg:#fff4dc}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}button,select,input{font:inherit}.wrap{max-width:780px;margin:auto;padding:16px 12px 40px}.hero{padding:8px 2px}.hero h1{margin:0;font-size:28px}.sub{color:var(--muted);font-size:14px;margin-top:5px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}.card h2{font-size:17px;margin:0 0 10px}.tabs,.teams{display:flex;gap:8px;flex-wrap:wrap}.btn{min-height:44px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 14px;font-weight:700}.btn.primary,.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.good{background:var(--good);color:#fff;border-color:var(--good)}.note{font-size:13px;color:var(--muted);line-height:1.45}.warn{background:var(--warnbg);color:#664100;border-radius:11px;padding:10px;font-size:13px;line-height:1.45;margin-top:10px}.teamgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.teamcol{border:1px solid var(--line);border-radius:12px;padding:10px}.teamcol b{display:block;margin-bottom:6px}.member{font-size:13px;padding:5px 0;border-top:1px dashed var(--line)}.member:first-of-type{border-top:0}.rounds{overflow-x:auto}.roundtable{border-collapse:collapse;width:100%;min-width:680px;font-size:12px}.roundtable th,.roundtable td{border:1px solid var(--line);padding:7px;vertical-align:top}.roundtable th{background:#fafafa}.picker{display:grid;grid-template-columns:1fr 1fr;gap:8px}select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px}.promptlist{display:grid;gap:8px}.prompt{border:1px solid var(--line);border-radius:13px;padding:11px;background:#fff}.prompt.done{background:var(--goodbg);border-color:#9bc7a8}.prompt-top{display:flex;gap:8px;align-items:flex-start}.num{width:26px;height:26px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-weight:800;color:var(--accent);flex:0 0 auto}.prompttext{font-size:14px;line-height:1.35;font-weight:650}.prompt-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:9px}.prompt-actions select{min-height:42px}.scorebar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{border:1px solid var(--line);border-radius:11px;padding:8px;text-align:center}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}.timerbox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.timer{font-size:32px;font-weight:900;font-variant-numeric:tabular-nums}.hidden{display:none}.mcscore{display:grid;gap:8px}.scoreteam{border:1px solid var(--line);border-radius:12px;padding:10px}.scoreteam h3{margin:0 0 8px;font-size:15px}.score-row{display:grid;grid-template-columns:1fr 84px 62px;gap:6px;align-items:center;margin:6px 0;font-size:13px}.score-row input{min-height:38px;width:100%;border:1px solid var(--line);border-radius:9px;padding:0 8px}.winner{font-size:18px;font-weight:800;text-align:center;padding:10px;border-radius:12px;background:var(--soft);margin-top:10px}.foot{text-align:center;color:var(--muted);font-size:11px;margin-top:16px}@media(max-width:520px){.teamgrid{grid-template-columns:1fr}.picker{grid-template-columns:1fr}.scorebar{grid-template-columns:repeat(3,1fr)}.prompt-actions{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}}
+</style>
 </head>
 <body>
 <div class="wrap">
   <section class="hero">
     <h1>🎯 Human Bingo Tam Đảo</h1>
-    <div class="sub">3 đội × 5 người · 8 phút · càng hiểu nhau, càng dễ Bingo.</div>
+    <div class="sub">5 vòng · 3 đội × 5 người · Tuấn & Sơn quản trò · chơi trực tiếp trên điện thoại</div>
   </section>
 
-  <section class="panel" id="rulesPanel">
-    <h2>Luật chơi chốt</h2>
-    <ul class="rules">
-      <li class="rule"><span class="badge">1</span><span>Mỗi đội dùng <b>1 điện thoại đại diện</b>. Chỉ hỏi người thuộc <b>2 đội còn lại</b>.</span></li>
-      <li class="rule"><span class="badge">2</span><span>Mỗi lần gặp một người, đội chỉ được hỏi <b>tối đa 2 câu</b>. Phải chọn câu trước khi hỏi; không được hỏi dần tới khi trúng.</span></li>
-      <li class="rule"><span class="badge">3</span><span>Đã hỏi xong 2 câu thì <b>không quay lại hỏi người đó lần nữa</b>. Một người chỉ được điền tối đa <b>2 ô</b> trên bảng.</span></li>
-      <li class="rule"><span class="badge">4</span><span>Trả lời “Có” thì ghi tên vào ô. Người được hỏi nên kể thêm <b>1 câu ngắn</b> để xác nhận và tạo câu chuyện.</span></li>
-      <li class="rule"><span class="badge">5</span><span><b>1 ô = 1 điểm</b> · mỗi hàng ngang/dọc/chéo đủ 4 ô = <b>+3</b> · full 16 ô = <b>+5</b>. Chơi hết 8 phút, không dừng khi có Bingo đầu tiên.</span></li>
-    </ul>
-    <div class="notice">⚠️ Không được đưa cả bảng cho người khác nhìn rồi hỏi “Anh/chị đúng ô nào?”. Trò vui ở chỗ phải đoán và chọn câu để hỏi.</div>
+  <section class="card">
+    <h2>Luật chốt</h2>
+    <div class="note">Mỗi người có đúng <b>5 câu săn</b>. Mỗi vòng bạn ngồi cùng 2 người của hai đội còn lại và được hỏi <b>mỗi người đúng 1 câu</b>. Nếu họ trả lời “Có”, bạn điền tên họ vào câu đó. Nếu “Không”, có thể mang chính câu đó đi hỏi người khác ở vòng sau. Sau 5 vòng, mỗi người đã gặp đủ 10 người ngoài đội, không trùng.</div>
+    <div class="warn">Điểm: mỗi câu tìm được người phù hợp = <b>1 điểm</b>. Nếu một người hoàn thành đủ 5/5 câu = <b>BINGO +3 điểm</b>. Điểm đội = tổng điểm của 5 thành viên. Tối đa 40 điểm/đội.</div>
   </section>
 
-  <section class="panel">
-    <h2>Chọn bảng của đội</h2>
-    <div class="team-grid">
-      <button class="team-btn" data-team="A">Đội A</button>
-      <button class="team-btn" data-team="B">Đội B</button>
-      <button class="team-btn" data-team="C">Đội C</button>
-    </div>
-    <div class="notice">MC gửi cùng một link cho cả 3 đội. Mỗi đội chọn đúng bảng được phân công rồi cử 1 người giữ điện thoại và nhập tên.</div>
+  <section class="card">
+    <h2>Chia đội sẵn</h2>
+    <div class="teamgrid" id="teamGrid"></div>
+    <div class="note" style="margin-top:8px">Mỗi đội 2 nữ + 3 nam, đồng thời trộn các Squad để mọi người giao lưu nhiều hơn.</div>
   </section>
 
-  <section class="panel" id="gamePanel" style="display:none">
-    <div class="controls">
-      <button class="primary" id="startBtn">▶ Bắt đầu 8 phút</button>
-      <button class="secondary" id="finishBtn">🏁 Chốt kết quả</button>
-      <button class="danger" id="resetBtn">↺ Chơi lại</button>
-      <span style="margin-left:auto" class="timer" id="timer">08:00</span>
-    </div>
-    <div class="stats">
-      <div class="stat"><b id="filledStat">0</b><span>ô</span></div>
-      <div class="stat"><b id="bingoStat">0</b><span>Bingo</span></div>
-      <div class="stat"><b id="uniqueStat">0</b><span>người khác nhau</span></div>
-      <div class="stat"><b id="scoreStat">0</b><span>điểm</span></div>
-    </div>
-    <div class="board" id="board"></div>
-    <div class="legend">🟦 Ô đã điền · 🟩 ô thuộc ít nhất một đường Bingo. Chạm vào ô để nhập/sửa tên.</div>
+  <section class="card">
+    <h2>Lịch đổi cụm 5 vòng</h2>
+    <div class="note">Đội A ngồi cố định. Sau mỗi vòng: <b>B dịch sang cụm kế tiếp theo chiều kim đồng hồ</b>, <b>C dịch ngược chiều kim đồng hồ</b>.</div>
+    <div class="rounds" style="margin-top:9px"><table class="roundtable" id="roundTable"></table></div>
   </section>
 
-  <section class="panel result" id="resultPanel">
-    <div class="score-label">KẾT QUẢ <span id="resultTeam"></span></div>
-    <div class="score-big" id="resultScore">0</div>
-    <div class="score-label">điểm</div>
-    <div class="result-grid">
-      <div><b id="resultFilled">0</b><span>ô hoàn thành</span></div>
-      <div><b id="resultBingo">0</b><span>đường Bingo</span></div>
-      <div><b id="resultUnique">0</b><span>người khác nhau</span></div>
+  <section class="card">
+    <h2>Chế độ sử dụng</h2>
+    <div class="tabs">
+      <button class="btn active" id="playerTab">👤 Người chơi</button>
+      <button class="btn" id="mcTab">🎤 MC</button>
     </div>
-    <div class="controls" style="justify-content:center">
-      <button class="primary" id="shareBtn">📤 Chia sẻ kết quả</button>
-      <button class="secondary" id="backBtn">← Quay lại bảng</button>
-    </div>
-    <div class="notice" style="text-align:left">Nếu bằng điểm: đội có nhiều <b>người khác nhau</b> hơn thắng → vẫn bằng thì đội có nhiều <b>Bingo</b> hơn thắng → vẫn bằng thì MC dùng 1 câu “5 giây kể 3 thứ” để sudden-death.</div>
   </section>
 
-  <div class="foot">Human Bingo · Tam Đảo Team Trip · Dữ liệu chỉ lưu trên chính điện thoại đang chơi.</div>
+  <section class="card" id="playerMode">
+    <h2>Chọn đúng tên của bạn</h2>
+    <div class="picker">
+      <select id="teamSelect"><option value="">Chọn đội</option></select>
+      <select id="memberSelect" disabled><option value="">Chọn thành viên</option></select>
+    </div>
+    <div id="playerArea" class="hidden">
+      <div class="scorebar">
+        <div class="stat"><b id="foundCount">0</b><span>câu đã tìm được</span></div>
+        <div class="stat"><b id="personalBonus">0</b><span>điểm Bingo bonus</span></div>
+        <div class="stat"><b id="personalScore">0</b><span>điểm cá nhân</span></div>
+      </div>
+      <div class="card" style="box-shadow:none;margin-top:10px">
+        <h2 style="margin-bottom:7px">5 câu của bạn</h2>
+        <div class="note">Ở mỗi vòng hãy chọn câu nào bạn nghĩ có khả năng “trúng” với người đang ngồi cùng. Một người chỉ được dùng để điền <b>1 câu</b> trên phiếu cá nhân của bạn.</div>
+        <div class="promptlist" id="promptList" style="margin-top:10px"></div>
+      </div>
+      <div class="card" style="box-shadow:none">
+        <h2>Bạn sẽ gặp ai?</h2>
+        <div id="myRounds" class="note"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="mcMode">
+    <h2>Điều khiển vòng chơi</h2>
+    <div class="timerbox">
+      <div class="timer" id="timer">01:15</div>
+      <button class="btn primary" id="startTimer">▶ Chạy vòng</button>
+      <button class="btn" id="resetTimer">↺ Reset</button>
+      <span class="note">Gợi ý: 75 giây/vòng + 10–15 giây đổi chỗ.</span>
+    </div>
+    <div class="card" style="box-shadow:none">
+      <h2>Nhập kết quả cuối game</h2>
+      <div class="note">Mỗi người báo số câu tìm được (0–5). Hệ thống tự cộng +3 nếu người đó đạt 5/5.</div>
+      <div class="mcscore" id="mcScore" style="margin-top:10px"></div>
+      <div class="winner" id="winner">Chưa có kết quả</div>
+    </div>
+  </section>
+
+  <div class="foot">Tam Đảo Team Trip · Dữ liệu chỉ lưu trên thiết bị đang mở trang</div>
 </div>
-
-<div class="modal" id="modal" aria-hidden="true">
-  <div class="sheet">
-    <h3 id="modalTitle">Điền ô</h3>
-    <div class="fullprompt" id="modalPrompt"></div>
-    <label for="nameInput">Tên người trả lời “Có”</label>
-    <input id="nameInput" autocomplete="off" placeholder="Ví dụ: Minh" maxlength="30" />
-    <div class="msg" id="modalMsg"></div>
-    <div class="sheet-actions">
-      <button class="primary" id="saveBtn">Lưu</button>
-      <button class="secondary" id="cancelBtn">Đóng</button>
-      <button class="danger" id="clearBtn">Xóa ô này</button>
-    </div>
-  </div>
-</div>
-
 <script>
-(() => {
-  const boards = {
-    A: [
-      '☕ Từng uống cà phê sau 20h mà vẫn ngủ bình thường',
-      '🐾 Từng nuôi ít nhất 2 loại thú cưng khác nhau',
-      '🏸 Hiện chơi cùng một môn thể thao ít nhất 1 buổi/tuần',
-      '🌅 Từng dậy trước 6h chỉ để ngắm bình minh',
-      '🎒 Từng đi du lịch 3N2Đ chỉ với balo hoặc hành lý xách tay',
-      '🧳 Từng đi du lịch và tới nơi mới phát hiện quên một món quan trọng',
-      '🎤 Có một bài karaoke gần như lần nào đi hát cũng chọn',
-      '🎬 Đã xem lại cùng một bộ phim ít nhất 3 lần',
-      '⏰ Thường đặt từ 2 báo thức trở lên vào buổi sáng',
-      '💬 Từng gửi tin nhắn rồi thu hồi trong vòng 1 phút',
-      '🍳 Có một món tủ tự tin nấu cho người khác ăn',
-      '🛍️ Từng mua một món vì “đẹp quá” dù không thực sự cần',
-      '🚪 Từng vào nhầm phòng, nhầm tầng hoặc nhầm cuộc họp',
-      '🧠 Thường nhớ mặt người tốt hơn nhớ tên',
-      '🌍 Từng quay lại cùng một điểm du lịch ít nhất 3 lần',
-      '😂 Từng cười ở một tình huống mà biết rõ là không nên cười'
-    ],
-    B: [
-      '🧋 Có một quán đồ uống gần như lần nào cũng gọi đúng một món',
-      '🐶 Từng nuôi một thú cưng liên tục trên 3 năm',
-      '🏅 Từng tham gia một trận hoặc giải thể thao có tính thắng thua',
-      '🌇 Từng chờ hơn 30 phút chỉ để ngắm hoặc chụp hoàng hôn',
-      '🗺️ Từng tới nơi du lịch rồi mới quyết định hôm đó sẽ đi đâu',
-      '🏨 Từng xin đổi phòng hoặc đổi khách sạn giữa chuyến vì không ưng',
-      '🎶 Có thể hát trọn 1 bài mà không cần nhìn lời',
-      '📺 Từng xem hết một season phim trong 2 ngày',
-      '😴 Từng tắt báo thức rồi ngủ tiếp quá 30 phút',
-      '🔋 Từng ra ngoài gần cả ngày khi pin dưới 20% mà không mang sạc',
-      '🌶️ Từng bị bạn bè nhận xét “cay thế mà cũng ăn được”',
-      '🛒 Từng mua hàng online sau 23h rồi sáng hôm sau hơi hối hận',
-      '🎙️ Từng vào họp online và có lúc quên tắt mic',
-      '📝 Có thói quen ghi to-do hoặc việc cần làm vào điện thoại',
-      '✈️ Từng tự đi máy bay một mình',
-      '📞 Từng thấy cuộc gọi đến và cố tình để lát nữa mới gọi lại'
-    ],
-    C: [
-      '🍜 Có một món có thể ăn 3 ngày liên tục mà không chán',
-      '📷 Trong 30 ảnh gần nhất có ảnh thú cưng hoặc động vật mình tự chụp',
-      '👟 Trong 3 tháng qua từng mua đồ riêng cho một môn thể thao hoặc sở thích',
-      '📸 Từng chụp hơn 100 ảnh trong một ngày đi chơi',
-      '🚗 Từng ngồi xe hơn 5 tiếng chỉ để đi du lịch',
-      '🌧️ Từng gặp mưa khi đi chơi nhưng vẫn quyết định đi tiếp',
-      '🎤 Từng cầm mic hát liền 2 bài karaoke',
-      '🎞️ Có một bộ phim nhớ được ít nhất 3 câu thoại',
-      '🌙 Có ít nhất 3 ngày mỗi tuần ngủ sau 0h',
-      '📵 Từng chủ động để điện thoại xa mình hơn 2 tiếng khi đang thức',
-      '🍣 Có một món trước đây ghét nhưng bây giờ lại thích',
-      '📦 Từng nhận từ 3 đơn hàng online trở lên trong cùng một tuần',
-      '📅 Từng nhớ nhầm lịch nhưng may phát hiện trước khi quá muộn',
-      '🔕 Hiện có ít nhất 5 nhóm chat đang tắt thông báo',
-      '🏔️ Từng đi một chuyến chủ yếu chỉ vì muốn check-in đúng 1 địa điểm',
-      '😅 Từng giả vờ hiểu câu chuyện rồi sau đó mới hỏi lại người khác'
-    ]
-  };
-
-  const lines = [
-    [0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],
-    [0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],
-    [0,5,10,15],[3,6,9,12]
-  ];
-
-  let team = null;
-  let selectedIndex = null;
-  let timerHandle = null;
-  let secondsLeft = 480;
-  let started = false;
-
-  const $ = s => document.querySelector(s);
-  const boardEl = $('#board');
-  const gamePanel = $('#gamePanel');
-  const resultPanel = $('#resultPanel');
-  const modal = $('#modal');
-  const nameInput = $('#nameInput');
-  const modalMsg = $('#modalMsg');
-
-  function key(t){ return 'tamdao-bingo-' + t; }
-  function load(t){
-    try{
-      const raw = localStorage.getItem(key(t));
-      const val = raw ? JSON.parse(raw) : null;
-      return Array.isArray(val) && val.length === 16 ? val : Array(16).fill('');
-    }catch(e){ return Array(16).fill(''); }
-  }
-  function save(t, arr){ try{ localStorage.setItem(key(t), JSON.stringify(arr)); }catch(e){} }
-  function normalize(s){ return (s||'').trim().toLocaleLowerCase('vi').replace(/\s+/g,' '); }
-  function values(){ return team ? load(team) : Array(16).fill(''); }
-
-  function calc(arr){
-    const filled = arr.filter(v => v.trim()).length;
-    const completedLines = lines.filter(line => line.every(i => arr[i].trim()));
-    const unique = new Set(arr.filter(v=>v.trim()).map(normalize)).size;
-    const score = filled + completedLines.length * 3 + (filled === 16 ? 5 : 0);
-    const bingoCells = new Set(completedLines.flat());
-    return {filled, bingo:completedLines.length, unique, score, bingoCells};
-  }
-
-  function render(){
-    if(!team) return;
-    const arr = values();
-    const st = calc(arr);
-    boardEl.innerHTML = '';
-    boards[team].forEach((prompt,i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'cell' + (arr[i] ? ' filled' : '') + (st.bingoCells.has(i) ? ' bingo' : '');
-      b.innerHTML = '<span class="tick">✓</span><span class="prompt"></span><span class="name"></span>';
-      b.querySelector('.prompt').textContent = prompt;
-      b.querySelector('.name').textContent = arr[i] ? '✓ ' + arr[i] : 'Chạm để điền';
-      b.addEventListener('click', () => openCell(i));
-      boardEl.appendChild(b);
-    });
-    $('#filledStat').textContent = st.filled;
-    $('#bingoStat').textContent = st.bingo;
-    $('#uniqueStat').textContent = st.unique;
-    $('#scoreStat').textContent = st.score;
-  }
-
-  function openCell(i){
-    selectedIndex = i;
-    const arr = values();
-    $('#modalTitle').textContent = 'Ô ' + (i+1) + ' · Đội ' + team;
-    $('#modalPrompt').textContent = boards[team][i];
-    nameInput.value = arr[i] || '';
-    modalMsg.textContent = 'Nhắc: người này chỉ được xuất hiện tối đa 2 ô trên bảng của đội.';
-    modal.classList.add('show');
-    modal.setAttribute('aria-hidden','false');
-    setTimeout(()=>nameInput.focus(),100);
-  }
-
-  function closeModal(){
-    modal.classList.remove('show');
-    modal.setAttribute('aria-hidden','true');
-    selectedIndex = null;
-  }
-
-  function selectTeam(t){
-    team = t;
-    document.querySelectorAll('.team-btn').forEach(b=>b.classList.toggle('active', b.dataset.team===t));
-    gamePanel.style.display = 'block';
-    resultPanel.classList.remove('show');
-    render();
-    setTimeout(()=>gamePanel.scrollIntoView({behavior:'smooth',block:'start'}),80);
-  }
-
-  function formatTime(s){
-    const m = Math.floor(s/60), r=s%60;
-    return String(m).padStart(2,'0') + ':' + String(r).padStart(2,'0');
-  }
-  function paintTimer(){
-    const el = $('#timer');
-    el.textContent = formatTime(secondsLeft);
-    el.classList.toggle('done', secondsLeft<=0);
-  }
-  function startTimer(){
-    if(timerHandle) clearInterval(timerHandle);
-    if(!started || secondsLeft<=0){ secondsLeft=480; }
-    started=true;
-    paintTimer();
-    timerHandle=setInterval(()=>{
-      secondsLeft--;
-      paintTimer();
-      if(secondsLeft<=0){
-        clearInterval(timerHandle); timerHandle=null;
-        if(navigator.vibrate) navigator.vibrate([180,80,180]);
-        alert('⏰ Hết 8 phút! Chốt kết quả nhé.');
-      }
-    },1000);
-    $('#startBtn').textContent='↻ Chạy lại 8 phút';
-  }
-
-  function showResult(){
-    if(!team) return;
-    const st = calc(values());
-    $('#resultTeam').textContent='ĐỘI '+team;
-    $('#resultScore').textContent=st.score;
-    $('#resultFilled').textContent=st.filled;
-    $('#resultBingo').textContent=st.bingo;
-    $('#resultUnique').textContent=st.unique;
-    resultPanel.classList.add('show');
-    resultPanel.scrollIntoView({behavior:'smooth',block:'start'});
-  }
-
-  document.querySelectorAll('.team-btn').forEach(b=>b.addEventListener('click',()=>selectTeam(b.dataset.team)));
-
-  $('#saveBtn').addEventListener('click',()=>{
-    if(selectedIndex===null || !team) return;
-    const n=nameInput.value.trim();
-    if(!n){ modalMsg.textContent='Nhập tên người trả lời “Có” trước khi lưu.'; return; }
-    const arr=values();
-    const nn=normalize(n);
-    const otherCount=arr.reduce((c,v,i)=>c+(i!==selectedIndex && normalize(v)===nn ? 1:0),0);
-    if(otherCount>=2){ modalMsg.textContent='⚠️ Người này đã có ở 2 ô khác. Theo luật, hãy tìm người khác.'; return; }
-    arr[selectedIndex]=n;
-    save(team,arr);
-    render();
-    closeModal();
-  });
-  $('#clearBtn').addEventListener('click',()=>{
-    if(selectedIndex===null || !team) return;
-    const arr=values(); arr[selectedIndex]=''; save(team,arr); render(); closeModal();
-  });
-  $('#cancelBtn').addEventListener('click',closeModal);
-  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-  nameInput.addEventListener('keydown',e=>{ if(e.key==='Enter') $('#saveBtn').click(); });
-
-  $('#startBtn').addEventListener('click',startTimer);
-  $('#finishBtn').addEventListener('click',showResult);
-  $('#backBtn').addEventListener('click',()=>{resultPanel.classList.remove('show');gamePanel.scrollIntoView({behavior:'smooth'});});
-  $('#resetBtn').addEventListener('click',()=>{
-    if(!team) return;
-    if(confirm('Xóa toàn bộ kết quả của Đội '+team+' và chơi lại từ đầu?')){
-      localStorage.removeItem(key(team));
-      if(timerHandle) clearInterval(timerHandle);
-      timerHandle=null;secondsLeft=480;started=false;paintTimer();$('#startBtn').textContent='▶ Bắt đầu 8 phút';render();
-    }
-  });
-  $('#shareBtn').addEventListener('click',async()=>{
-    if(!team) return;
-    const st=calc(values());
-    const text=`🎯 Human Bingo Tam Đảo – Đội ${team}\n🏆 ${st.score} điểm\n✅ ${st.filled}/16 ô\n🎉 ${st.bingo} Bingo\n👥 ${st.unique} người khác nhau`;
-    try{
-      if(navigator.share) await navigator.share({title:'Human Bingo Tam Đảo',text});
-      else { await navigator.clipboard.writeText(text); alert('Đã copy kết quả để gửi cho MC.'); }
-    }catch(e){}
-  });
-
-  const params=new URLSearchParams(location.search);
-  const q=(params.get('team')||'').toUpperCase();
-  if(['A','B','C'].includes(q)) selectTeam(q);
-  paintTimer();
-})();
+const teams={
+ A:[
+  {id:'A1',name:'Nguyễn Lan Linh',q:['☕ Từng uống cà phê sau 20h mà vẫn ngủ trước 0h','🎒 Từng đi du lịch 3N2Đ chỉ với balo hoặc hành lý xách tay','⏰ Thường đặt từ 2 báo thức trở lên vào buổi sáng','🎬 Đã xem lại cùng một bộ phim ít nhất 3 lần','💬 Từng gửi tin nhắn rồi thu hồi trong vòng 1 phút']},
+  {id:'A2',name:'Phan Mỹ Hân',q:['🍜 Có một món có thể ăn 3 ngày liên tục mà không chán','🌅 Từng chủ động dậy trước 6h chỉ để ngắm bình minh','🌙 Có ít nhất 3 ngày/tuần ngủ sau 0h','🎤 Có một bài karaoke gần như lần nào đi hát cũng chọn','🛍️ Từng mua một món chỉ vì thấy quá đẹp dù không thực sự cần']},
+  {id:'A3',name:'Mai Tấn Thành',q:['🍳 Có một món tủ tự tin nấu cho người khác ăn','🧳 Từng đi du lịch và tới nơi mới phát hiện quên một món quan trọng','😴 Từng tắt báo thức rồi ngủ tiếp quá 30 phút','📺 Từng xem hết một season phim trong 2 ngày','🚪 Từng vào nhầm phòng, nhầm tầng hoặc nhầm cuộc họp']},
+  {id:'A4',name:'Hoàng Thành Trí',q:['🌶️ Từng bị người khác nhận xét là ăn cay rất tốt','🚗 Từng ngồi xe hơn 5 tiếng chỉ để đi chơi','🔌 Khi đi xa thường mang cả dây sạc và pin dự phòng','🎤 Từng cầm mic hát liền 2 bài karaoke','🛒 Từng mua hàng online sau 23h rồi sáng hôm sau hơi hối hận']},
+  {id:'A5',name:'Huỳnh Công Sinh',q:['🧋 Có một quán đồ uống gần như lần nào cũng gọi đúng một món','🌧️ Từng đi chơi gặp mưa nhưng vẫn quyết định đi tiếp','📵 Từng chủ động để điện thoại xa mình hơn 2 tiếng khi đang thức','🎞️ Có một bộ phim nhớ được ít nhất 3 câu thoại','📅 Từng nhớ nhầm lịch nhưng may phát hiện trước khi quá muộn']}
+ ],
+ B:[
+  {id:'B1',name:'Nguyễn Thị Mai Phương',q:['🥐 Từng bỏ bữa sáng chỉ vì ngủ nướng','📸 Từng chụp hơn 100 ảnh trong một ngày đi chơi','🧠 Thường nhớ mặt người tốt hơn nhớ tên','🎶 Có thể hát trọn một bài karaoke mà không cần nhìn lời','📞 Từng thấy cuộc gọi đến và quyết định “lát nữa gọi lại”']},
+  {id:'B2',name:'Uông Thị Hải Yến',q:['🍣 Có một món trước đây không thích nhưng giờ lại thích','🗺️ Từng đi du lịch mà không lên lịch chi tiết trước','🔋 Từng ra ngoài gần cả ngày khi pin dưới 20% mà không mang sạc','🌙 Từng xem phim hoặc series đến sau 1h sáng','😂 Từng cười ở một tình huống mà biết rõ là không nên cười']},
+  {id:'B3',name:'Nguyễn Duy Việt',q:['☕ Từng uống từ 2 ly cà phê hoặc trà sữa trở lên trong một ngày','🌍 Từng quay lại cùng một địa điểm du lịch ít nhất 3 lần','📝 Có thói quen ghi to-do hoặc note việc cần làm trên điện thoại','🎮 Từng chơi một game trên điện thoại liên tục hơn 1 giờ','🎙️ Từng vào họp online và có lúc quên tắt mic']},
+  {id:'B4',name:'Nguyễn Gia Huy',q:['🥘 Có một món nhất quyết không ăn dù mọi người rủ','✈️ Từng tự đi máy bay một mình','🔐 Từng quên mật khẩu của một tài khoản mình vẫn hay dùng','🎧 Từng nghe cùng một bài hát hơn 5 lần trong một ngày','📦 Từng nhận từ 3 đơn hàng online trở lên trong cùng một tuần']},
+  {id:'B5',name:'Nguyễn Việt Dũng',q:['🍜 Có một món ăn sáng gần như tuần nào cũng ăn','🏔️ Từng đi một chuyến chủ yếu vì muốn check-in đúng một địa điểm','🔕 Hiện có ít nhất 5 nhóm chat đang tắt thông báo','📱 Từng xem lại cùng một clip/video hài ít nhất 5 lần','😅 Từng giả vờ hiểu câu chuyện rồi sau đó mới hỏi người khác']}
+ ],
+ C:[
+  {id:'C1',name:'Chu Thị Xuân',q:['🍽️ Có một quán ăn đã quay lại ít nhất 5 lần','🏡 Từng chọn homestay hoặc hostel thay vì khách sạn cho một chuyến đi','👜 Từng đi làm/đi học rồi mới phát hiện quên một món cần thiết','🎵 Có một playlist riêng hay mở khi làm việc hoặc đọc sách','🛫 Từng đặt vé hoặc chỗ ở cho chuyến đi chưa đầy 48h trước khi khởi hành']},
+  {id:'C2',name:'Nguyễn Thu Thủy',q:['🥢 Từng thử một món khá lạ chỉ vì người khác rủ','🎬 Từng đi xem phim ngoài rạp một mình','⏰ Thường đặt báo thức sớm hơn giờ cần dậy ít nhất 30 phút','💇 Từng đổi kiểu tóc khá khác so với bình thường trong 2 năm gần đây','📷 Từng chụp ảnh đồ ăn trước khi ăn ít nhất 3 lần trong một tuần']},
+  {id:'C3',name:'Hồ Khánh Quỳnh',q:['☕ Từng uống cà phê hoàn toàn không đường','🧭 Từng bị lạc đường khi đi du lịch','🚶 Từng đi bộ trên 15.000 bước trong một ngày','🎶 Thuộc lời ít nhất một bài hát tiếng nước ngoài dù không hiểu hết nghĩa','🛍️ Từng mua một món đồ rồi để hơn 1 tháng gần như không dùng']},
+  {id:'C4',name:'Phạm Anh Tuấn',q:['🍳 Có một món có thể tự nấu trong dưới 15 phút','🏍️ Từng đi xe máy hơn 100 km chỉ để đi chơi','😴 Từng ngủ gật trên xe và suýt hoặc đã đi quá điểm cần xuống','🎥 Từng xem lại cùng một video/clip hơn 5 lần vì quá thích','🎧 Từng bỏ quên sạc hoặc tai nghe ở một nơi bên ngoài nhà']},
+  {id:'C5',name:'Hoàng Công Huân',q:['🍰 Có thói quen ăn đồ ngọt sau bữa chính ít nhất vài lần/tuần','🌦️ Từng đổi lịch trình du lịch ngay trong ngày vì thời tiết','🌙 Từng thức sau 2h sáng dù hôm sau vẫn phải đi làm hoặc đi học','🎙️ Từng nghe một podcast/talk dài hơn 30 phút từ đầu đến cuối','💬 Từng gửi nhầm tin nhắn vào một nhóm chat']}
+ ]
+};
+const pos={};Object.values(teams).flat().forEach((m,i)=>pos[m.id]=m);
+const rounds=[];for(let r=0;r<5;r++){const clusters=[];for(let j=0;j<5;j++){const A=teams.A[j],B=teams.B[(j-r+5)%5],C=teams.C[(j+r)%5];clusters.push([A,B,C]);}rounds.push(clusters)}
+function renderTeams(){const g=document.getElementById('teamGrid');g.innerHTML='';['A','B','C'].forEach(t=>{const d=document.createElement('div');d.className='teamcol';d.innerHTML=`<b>Đội ${t}</b>`+teams[t].map(m=>`<div class="member"><b style="display:inline">${m.id}</b> · ${m.name}</div>`).join('');g.appendChild(d)})}
+function renderRounds(){const t=document.getElementById('roundTable');let h='<tr><th>Vòng</th>';for(let i=1;i<=5;i++)h+=`<th>Cụm ${i}</th>`;h+='</tr>';rounds.forEach((cs,r)=>{h+=`<tr><th>Vòng ${r+1}</th>`;cs.forEach(c=>h+=`<td>${c.map(x=>`<b>${x.id}</b> ${x.name}`).join('<br>')}</td>`);h+='</tr>'});t.innerHTML=h}
+renderTeams();renderRounds();
+const teamSelect=document.getElementById('teamSelect'),memberSelect=document.getElementById('memberSelect');['A','B','C'].forEach(t=>teamSelect.add(new Option('Đội '+t,t)));
+teamSelect.addEventListener('change',()=>{memberSelect.innerHTML='<option value="">Chọn thành viên</option>';memberSelect.disabled=!teamSelect.value;if(teamSelect.value)teams[teamSelect.value].forEach(m=>memberSelect.add(new Option(m.id+' · '+m.name,m.id)));document.getElementById('playerArea').classList.add('hidden')});
+memberSelect.addEventListener('change',renderPlayer);
+function storeKey(id){return 'tdbingo-'+id}function loadState(id){try{return JSON.parse(localStorage.getItem(storeKey(id)))||Array(5).fill('')}catch(e){return Array(5).fill('')}}function saveState(id,a){localStorage.setItem(storeKey(id),JSON.stringify(a))}
+function opponents(id){const m=pos[id],team=id[0],out=[];rounds.forEach((cs,r)=>{const c=cs.find(c=>c.some(x=>x.id===id));out.push({round:r+1,people:c.filter(x=>x.id!==id)})});return out}
+function renderPlayer(){const id=memberSelect.value;if(!id)return;document.getElementById('playerArea').classList.remove('hidden');const m=pos[id],state=loadState(id),opps=Object.values(teams).flat().filter(x=>x.id[0]!==id[0]);const list=document.getElementById('promptList');list.innerHTML='';m.q.forEach((q,i)=>{const d=document.createElement('div');d.className='prompt'+(state[i]?' done':'');const used=new Set(state.filter(Boolean));d.innerHTML=`<div class="prompt-top"><span class="num">${i+1}</span><div class="prompttext"></div></div><div class="prompt-actions"><select><option value="">Chưa tìm được ai</option></select><button class="btn">Xóa</button></div>`;d.querySelector('.prompttext').textContent=q;const s=d.querySelector('select');opps.forEach(o=>{const opt=new Option(o.id+' · '+o.name,o.id);if(used.has(o.id)&&state[i]!==o.id)opt.disabled=true;s.add(opt)});s.value=state[i]||'';s.addEventListener('change',()=>{const a=loadState(id);a[i]=s.value;saveState(id,a);renderPlayer()});d.querySelector('button').addEventListener('click',()=>{const a=loadState(id);a[i]='';saveState(id,a);renderPlayer()});list.appendChild(d)});const found=state.filter(Boolean).length,bonus=found===5?3:0;document.getElementById('foundCount').textContent=found;document.getElementById('personalBonus').textContent=bonus;document.getElementById('personalScore').textContent=found+bonus;document.getElementById('myRounds').innerHTML=opponents(id).map(x=>`<b>Vòng ${x.round}:</b> ${x.people.map(p=>p.id+' '+p.name).join(' + ')}`).join('<br>')}
+const playerTab=document.getElementById('playerTab'),mcTab=document.getElementById('mcTab'),playerMode=document.getElementById('playerMode'),mcMode=document.getElementById('mcMode');playerTab.onclick=()=>{playerTab.classList.add('active');mcTab.classList.remove('active');playerMode.classList.remove('hidden');mcMode.classList.add('hidden')};mcTab.onclick=()=>{mcTab.classList.add('active');playerTab.classList.remove('active');mcMode.classList.remove('hidden');playerMode.classList.add('hidden')};
+let secs=75,handle=null;const timer=document.getElementById('timer');function paint(){timer.textContent=`${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`};paint();document.getElementById('startTimer').onclick=()=>{if(handle)clearInterval(handle);if(secs<=0)secs=75;handle=setInterval(()=>{secs--;paint();if(secs<=0){clearInterval(handle);handle=null;if(navigator.vibrate)navigator.vibrate([150,80,150]);alert('Hết vòng! Đổi cụm nhé.')}},1000)};document.getElementById('resetTimer').onclick=()=>{if(handle)clearInterval(handle);handle=null;secs=75;paint()};
+function renderMcScore(){const box=document.getElementById('mcScore');box.innerHTML='';['A','B','C'].forEach(t=>{const d=document.createElement('div');d.className='scoreteam';d.innerHTML=`<h3>Đội ${t} · <span id="sum${t}">0 điểm</span></h3>`;teams[t].forEach(m=>{const r=document.createElement('div');r.className='score-row';r.innerHTML=`<span>${m.id} ${m.name}</span><input type="number" min="0" max="5" value="0" data-team="${t}"><span class="note">0đ</span>`;const inp=r.querySelector('input'),sp=r.querySelector('span:last-child');inp.addEventListener('input',()=>{let v=Math.max(0,Math.min(5,Number(inp.value)||0));inp.value=v;sp.textContent=(v+(v===5?3:0))+'đ';calcWinner()});d.appendChild(r)});box.appendChild(d)});calcWinner()}
+function calcWinner(){const totals={A:0,B:0,C:0};document.querySelectorAll('#mcScore input').forEach(inp=>{const v=Number(inp.value)||0;totals[inp.dataset.team]+=v+(v===5?3:0)});['A','B','C'].forEach(t=>{const el=document.getElementById('sum'+t);if(el)el.textContent=totals[t]+' điểm'});const max=Math.max(...Object.values(totals));const ws=Object.keys(totals).filter(t=>totals[t]===max);document.getElementById('winner').textContent=max===0?'Chưa có kết quả':ws.length===1?`🏆 Đội ${ws[0]} đang dẫn với ${max} điểm`:`🤝 Đang hòa: ${ws.map(x=>'Đội '+x).join(' & ')} · ${max} điểm`}
+renderMcScore();
 </script>
 </body>
 </html>
